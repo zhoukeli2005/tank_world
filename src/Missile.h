@@ -116,12 +116,6 @@ namespace game
 
 				m_last_time = now;
 
-				// 自传
-				Rotate(2, 0, 0);
-
-				// 朝向
-				ResetFace(m_curr_velocity);
-
 				// 移动
 				math::Vector dis = m_curr_velocity * delta;
 				
@@ -143,6 +137,41 @@ namespace game
 				Copy((MeshGameObject *)m);
 
 				return m;
+			}
+
+		protected:
+			virtual D3DXMATRIX iGetLocalMatrix()
+			{
+				D3DXMATRIX mscale, mrotate, mtrans, out;
+	
+				D3DXMatrixScaling(&mscale, m_scale.x, m_scale.y, m_scale.z);
+
+			//	D3DXMatrixRotationYawPitchRoll(&mrotate, D3DXToRadian(m_rotate.y), D3DXToRadian(m_rotate.x), D3DXToRadian(m_rotate.z));
+				// 自传
+				static int angle = 0;
+				D3DXMatrixIdentity(&mrotate);
+		//		D3DXMatrixRotationX(&mrotate, angle++);
+
+				D3DXMATRIX tmp;
+				float a = atan(-m_curr_velocity.y / m_curr_velocity.x);
+				float x = cos(a) - sin(a);
+				float z = sin(a) + cos(a);
+
+				float b = math::Vector(x, 0, z) * math::Vector(1, 0, 0);
+				b = acos(b);
+
+				D3DXMatrixRotationY(&tmp, b);
+
+				mrotate *= tmp;
+
+				D3DXMatrixRotationZ(&tmp, -a);
+				mrotate *= tmp;
+
+				D3DXMatrixTranslation(&mtrans, m_position.x, m_position.y, m_position.z);
+
+				out = mscale * mrotate * mtrans;
+
+				return out;
 			}
 
 		private:
