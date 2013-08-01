@@ -35,6 +35,21 @@ namespace math
 				m_max.z = max(m_max.z, z);
 			}
 
+			int CheckConflict(const AABB & other)
+			{
+				if(	m_min.x <= other.m_max.x && m_min.y <= other.m_max.y && m_min.z <= other.m_max.z &&
+					m_max.x >= other.m_min.x && m_max.y >= other.m_min.y && m_max.z >= other.m_min.z) {
+						return TRUE;
+				}
+				return FALSE;
+			}
+
+			const Vector & GetMin() const { return m_min; }
+			const Vector & GetMax() const { return m_max; }
+
+			void SetMin(const Vector & _min) { m_min = _min; }
+			void SetMax(const Vector & _max) { m_max = _max; }
+
 		private:
 			Vector m_min;
 			Vector m_max;

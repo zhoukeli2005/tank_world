@@ -80,7 +80,9 @@ public:
 		RSHIFT			= 0xA1,
 
 		LCTL			= 0xA2,
-		RCTL			= 0xA3
+		RCTL			= 0xA3,
+
+		__MAX__			= 0xFF + 1
 	};
 };
 

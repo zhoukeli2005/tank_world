@@ -1,6 +1,8 @@
 #ifndef _vector_h_
 #define _vector_h_
 
+#include "Config.h"
+
 namespace math
 {
 	class Vector
@@ -55,6 +57,45 @@ namespace math
 
 				return *this;
 			}
+
+			float Length() const
+			{
+				return sqrt(x * x + y * y + z * z);
+			}
+
+			float operator * (const Vector & v) const
+			{
+				return x * v.x + y * v.y + z * v.z;
+			}
+
+			Vector & operator *= (const float d)
+			{
+				x *= d;
+				y *= d;
+				z *= d;
+
+				return *this;
+			}
+
+			Vector operator * (const float d) const
+			{
+				Vector tmp = *this;
+				tmp *= d;
+
+				return tmp;
+			}
+
+			Vector & Normalize()
+			{
+				int len = Length();
+				if(len > 0) {
+					x /= len;
+					y /= len;
+					z /= len;
+				}
+				return *this;
+			}
+
 
 		public:
 			float x, y, z;

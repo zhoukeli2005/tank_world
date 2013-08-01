@@ -25,6 +25,9 @@
     <Filter Include="src\game">
       <UniqueIdentifier>{726b1d99-a708-4f49-9e2a-4dcd02faa0dd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\game">
+      <UniqueIdentifier>{dcfdc033-880b-447c-802b-13b5e9d16969}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\GameObject.h">
@@ -32,9 +35,6 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Screen.h">
       <Filter>include\engine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\TankWorld.h">
-      <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\Config.h">
       <Filter>include</Filter>
@@ -72,6 +72,24 @@
     <ClInclude Include="..\..\src\AABB.h">
       <Filter>include\math</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\TankWorld.h">
+      <Filter>include\game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\OctTree.h">
+      <Filter>include\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\TankWorldConfig.h">
+      <Filter>include\game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Tank.h">
+      <Filter>include\game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Missile.h">
+      <Filter>include\game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\PlayerTank.h">
+      <Filter>include\game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp">
@@ -88,6 +106,12 @@
     </ClCompile>
     <ClCompile Include="..\..\src\MeshGameObject.cpp">
       <Filter>src\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\OctTree.cpp">
+      <Filter>src\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Tank.cpp">
+      <Filter>src\game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

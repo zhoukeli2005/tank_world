@@ -18,7 +18,9 @@ MeshGameObject::~MeshGameObject()
 
 	if(m_textures) {
 		for(i = 0; i < m_count; ++i) {
-			m_textures[i]->Release();
+			if(m_textures[i]) {
+				m_textures[i]->Release();
+			}
 		}
 		delete[] m_textures;
 		m_textures = NULL;
@@ -92,12 +94,12 @@ void MeshGameObject::Draw()
 	}
 }
 
-MeshGameObject * MeshGameObject::Copy()
+void MeshGameObject::Copy(MeshGameObject * m)
 {
-	MeshGameObject * m = new MeshGameObject(m_screen);
+//	MeshGameObject * m = new MeshGameObject(m_screen);
 
 	m->m_count = m_count;
-	
+
 	m_mesh->AddRef();
 	m->m_mesh = m_mesh;
 
@@ -114,6 +116,4 @@ MeshGameObject * MeshGameObject::Copy()
 			m_textures[i]->AddRef();
 		}
 	}
-
-	return m;
 }

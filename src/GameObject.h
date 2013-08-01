@@ -26,11 +26,13 @@ namespace engine {
 			void Drop() 
 			{
 				m_ref_count--;
-				if(m_ref_count == 0) {
-					delete this;
-				}
+
 				if(m_ref_count < 0) {
 					Warning("Drop Error! Check Memory Release!");
+				}
+
+				if(m_ref_count == 0) {
+					delete this;
 				}
 			}
 
@@ -42,16 +44,21 @@ namespace engine {
 
 			// Children
 			virtual void AddChild(GameObject * child);
-			virtual void RemoveChild(GameObject * child);
 			virtual void RemoveFromScreen();
 
 			// Transform
 			virtual math::Vector GetLocalPosition();
 			virtual math::Vector GetGlobalPosition();
 			virtual math::Vector ToGlobalPosition(const math::Vector & v);
+			virtual math::Vector ToGlobalVector(const math::Vector & v)
+			{
+				math::Vector o = ToGlobalPosition(math::Vector(0, 0, 0));
+				math::Vector l = ToGlobalPosition(v);
+
+				return l - o;
+			}
 
 			virtual math::Vector GetLocalRotate();
-	//		virtual math::Vector GetGlobalRotate();
 
 			virtual math::Vector GetLocalScale();
 			virtual math::Vector GetGlobalScale();
@@ -61,6 +68,7 @@ namespace engine {
 
 			virtual void MoveForward(float distance);
 			virtual void MoveBackward(float distance);
+			virtual void MoveToward(float distance, const math::Vector & direction);
 
 			virtual void SetOriginFaceDirection(float x, float y, float z);
 			virtual D3DXVECTOR3 GetFaceDirectionGlobal();
@@ -78,6 +86,8 @@ namespace engine {
 			D3DXMATRIX iGetWorldMatrix();
 			D3DXMATRIX iGetLocalMatrix();
 
+		private:
+			void RemoveChild(GameObject * child);
 
 		// members -- cannot access from children
 		private:
@@ -86,6 +96,8 @@ namespace engine {
 			GameObject *	m_sibling;
 
 			math::Vector	m_origin_face;
+
+			int m_is_removing;
 
 			// reference count
 			int m_ref_count;
@@ -103,8 +115,6 @@ namespace engine {
 			IDirect3DIndexBuffer9 *		m_index;
 			int							m_vertex_count;
 			int							m_index_count;
-
-			math::AABB	m_aabb;
 
 	};
 }

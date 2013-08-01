@@ -1,6 +1,9 @@
 #ifndef _util_h_
 #define _util_h_
 
+#include "Config.h"
+#include "Vector.h"
+
 namespace math
 {
 	class Util
@@ -13,7 +16,7 @@ namespace math
 
 				return D3DXVECTOR3(v4.x, v4.y, v4.z);
 			}
-	};	
+	};
 }
 
 #endif

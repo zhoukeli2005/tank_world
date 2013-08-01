@@ -18,6 +18,7 @@ GameObject::GameObject(Screen * scn)
 ,m_index(NULL)
 ,m_vertex_count(0)
 ,m_origin_face(0, 0, 1)
+,m_is_removing(0)
 {
 	m_device = m_screen->GetDevice();
 }
@@ -39,9 +40,20 @@ GameObject::~GameObject()
 void GameObject::Draw()
 {
 	GameObject * child = m_first_child;
+
 	while(child) {
+		GameObject * next = child->m_sibling;
+		if(child->m_is_removing) {
+			RemoveChild(child);
+		}
+		child = next;
+	}
+	
+	child = m_first_child;
+	while(child) {
+		GameObject * next = child->m_sibling;
 		child->Draw();
-		child = child->m_sibling;
+		child = next;
 	}
 
 
@@ -67,13 +79,21 @@ void GameObject::Draw()
 
 void GameObject::AddChild(GameObject * child)
 {
-	child->RemoveFromScreen();
+	if(child->m_parent == this) {
+		return;
+	}
+
+	child->Grab();
+
+	if(child->m_parent) {
+		child->m_parent->RemoveChild(child);
+	}
 
 	child->m_parent = this;
 	child->m_sibling = NULL;
 
 	child->m_sibling = m_first_child;
-	m_first_child = child;		
+	m_first_child = child;
 }
 
 void GameObject::RemoveChild(GameObject * child)
@@ -90,6 +110,7 @@ void GameObject::RemoveChild(GameObject * child)
 
 	if(m_first_child == child) {
 		m_first_child = sibling;
+		child->Drop();
 		return;
 	}
 
@@ -104,13 +125,12 @@ void GameObject::RemoveChild(GameObject * child)
 	}
 
 	prev->m_sibling = sibling;
+	child->Drop();
 }
 
 void GameObject::RemoveFromScreen()
 {
-	if(m_parent) {
-		m_parent->RemoveChild(this);
-	}
+	m_is_removing = 1;
 }
 
 math::Vector GameObject::GetLocalPosition()
@@ -137,15 +157,6 @@ math::Vector GameObject::GetLocalRotate()
 {
 	return m_rotate;
 }
-/*
-math::Vector GameObject::GetGlobalRotate()
-{
-	math::Vector g;
-	if(m_parent) {
-		g = m_parent->GetGlobalRotate();
-	}
-	return m_rotate + g;
-}*/
 
 math::Vector GameObject::GetLocalScale()
 {
@@ -163,9 +174,7 @@ math::Vector GameObject::GetGlobalScale()
 
 void GameObject::Move(float dx, float dy, float dz)
 {
-	m_position.x += dx;
-	m_position.y += dy;
-	m_position.z += dz;
+	MoveTo(m_position.x + dx, m_position.y + dy, m_position.z + dz);
 }
 
 void GameObject::MoveTo(float x, float y, float z)
@@ -188,6 +197,14 @@ void GameObject::MoveBackward(float distance)
 	D3DXVECTOR3 face = GetFaceDirectionLocal();
 
 	Move(-face.x * distance, -face.y * distance, -face.z * distance);
+}
+
+void GameObject::MoveToward(float distance, const math::Vector & direction)
+{
+	math::Vector tmp = direction;
+	tmp.Normalize();
+
+	Move(distance * tmp.x, distance * tmp.y, distance * tmp.z);
 }
 
 void GameObject::SetOriginFaceDirection(float x, float y, float z)

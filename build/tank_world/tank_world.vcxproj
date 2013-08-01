@@ -83,10 +83,15 @@
     <ClInclude Include="..\..\src\DirectionalLight.h" />
     <ClInclude Include="..\..\src\GameObject.h" />
     <ClInclude Include="..\..\src\MeshGameObject.h" />
+    <ClInclude Include="..\..\src\Missile.h" />
+    <ClInclude Include="..\..\src\OctTree.h" />
+    <ClInclude Include="..\..\src\PlayerTank.h" />
+    <ClInclude Include="..\..\src\Tank.h" />
     <ClInclude Include="..\..\src\resource.h" />
     <ClInclude Include="..\..\src\Screen.h" />
     <ClInclude Include="..\..\src\SkyBoxGameObject.h" />
     <ClInclude Include="..\..\src\TankWorld.h" />
+    <ClInclude Include="..\..\src\TankWorldConfig.h" />
     <ClInclude Include="..\..\src\Util.h" />
     <ClInclude Include="..\..\src\Vector.h" />
     <ClInclude Include="..\..\src\Vertex.h" />
@@ -96,6 +101,8 @@
     <ClCompile Include="..\..\src\GameObject.cpp" />
     <ClCompile Include="..\..\src\MeshGameObject.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
+    <ClCompile Include="..\..\src\OctTree.cpp" />
+    <ClCompile Include="..\..\src\Tank.cpp" />
     <ClCompile Include="..\..\src\Screen.cpp" />
     <ClCompile Include="..\..\src\TankWorld.cpp" />
   </ItemGroup>

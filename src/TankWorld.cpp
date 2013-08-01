@@ -4,16 +4,18 @@
 #include "GameObject.h"
 #include "Camera.h"
 #include "Config.h"
+#include "PlayerTank.h"
+#include "Missile.h"
 
 using namespace game;
 
 void TankWorld::Start()
 {
+	// oct tree
+	m_scene_octree = new engine::OctTree();
+
 	// camera
 	m_camera = new engine::Camera(this);
-	GetRoot()->AddChild(m_camera);
-	m_camera->MoveTo(0, 1500, 0);
-	m_camera->RotateTo(90, 0, 0);
 
 	// sky
 	m_sky = new engine::SkyBoxGameObject(this);
@@ -35,35 +37,44 @@ void TankWorld::Start()
 	m_platform = new engine::MeshGameObject(this);
 	m_platform->LoadFromFile(".\\resource\\platform\\platform.x");
 	GetRoot()->AddChild(m_platform);
-	m_platform->MoveTo(0, 0, 0);
+	m_platform->MoveTo(0, 500, 0);
 
 	// terrain
-	m_terrain = m_platform->Copy();
-	m_terrain->ScaleTo(3, 3, 3);
+	m_terrain = new MeshGameObject(this);
+	m_platform->Copy(m_terrain);
+	m_terrain->ScaleTo(10, 10, 10);
 
 	GetRoot()->AddChild(m_terrain);
-	m_terrain->MoveTo(0, -100, 0);
+	m_terrain->MoveTo(0, -200, 0);
+
 	// tank
-	m_tank = new engine::MeshGameObject(this);
+	m_tank = new PlayerTank(this, E_TT_TANK_PLAYER);
 	m_tank->LoadFromFile(".\\resource\\tank\\tank1.x");
-	m_tank->MoveTo(0, 30, 0);
+	m_tank->MoveTo(0, 50, 0);
 	m_tank->SetOriginFaceDirection(0, 0, -1);
 
 	m_platform->AddChild(m_tank);
+	
+//	Missile * missile = new Missile(this, E_TT_MISSILE_PLAYER);
+//	missile->LoadFromFile(".\\resource\\missile\\m1.x");
+//	GetRoot()->AddChild(missile);
+//	missile->ScaleTo(0.03, 0.03, 0.03);
+//	missile->Start(math::Vector(50, 600, 0), math::Vector(0, 0, 1), 10);
 
-//	m_tank->AddChild(m_camera);
-//	m_camera->MoveTo(0, 1050, 80);
-//	m_camera->RotateTo(0, 180, 0);
+	// init missile
+	m_missile = new Missile(this, E_TT_MISSILE_PLAYER);
+	m_missile->LoadFromFile(".\\resource\\missile\\m1.x");
 
+	SetGodView();
 }
 
 void TankWorld::iEnterFrame()
 {
-	int range = 100;
-	m_platform->Rotate(0, 0.01, 0);
+	int range = 500;
+//	m_platform->Rotate(0, 0.03, 0);
 
 	math::Vector rotate = m_platform->GetLocalRotate();
-	m_platform->MoveTo(range * sin(D3DXToRadian(rotate.y)), m_platform->GetLocalPosition().y, range * cos(D3DXToRadian(rotate.y)));
+//	m_platform->MoveTo(range * sin(D3DXToRadian(rotate.y)), m_platform->GetLocalPosition().y, range * cos(D3DXToRadian(rotate.y)));
 }
 
 void TankWorld::OnLButtonDown(long x, long y)
@@ -95,21 +106,54 @@ void TankWorld::OnMouseMove(long x, long y)
 void TankWorld::OnKeyDown(int vk)
 {
 	if(vk == VK::A) {
-		m_tank->Rotate(0, -2, 0);
+	//	m_tank->Rotate(0, -2, 0);
+		m_tank->StartRotate(-40);
 	}
 	if(vk == VK::D) {
-		m_tank->Rotate(0, 2, 0);
+	//	m_tank->Rotate(0, 2, 0);
+		m_tank->StartRotate(40);
 	}
 	if(vk == VK::W) {
-		m_tank->MoveForward(2);
+	//	m_tank->MoveForward(2);
+		m_tank->StartMove(40);
 	}
 	if(vk == VK::S) {
-		m_tank->MoveBackward(2);
+	//	m_tank->MoveBackward(2);
+		m_tank->StartMove(-40);
 	}
 
 	math::Vector v;
 	if(vk == VK::SPACE) {
-		v = m_camera->GetGlobalPosition();
+		if(m_view_type == E_GOD_VIEW) {
+			SetTankView();
+		} else {
+			SetGodView();
+		}
+	}
+
+	if(vk == VK::J) {
+		m_tank->StartFire();
+
+		Missile * m = m_missile->CopyMissile();
+		GetRoot()->AddChild(m);
+		math::Vector pos = m_tank->ToGlobalPosition(math::Vector(-3, 10, -52));
+		D3DXVECTOR3 face3 = m_tank->GetFaceDirectionGlobal();
+		math::Vector face(face3.x, face3.y, face3.z);
+		m->Start(pos, face, 20);
+	}
+
+	if(vk == VK::G) {
+		m_tank->StartUnderHit(math::Vector(1, 0, 0));
+	}
+}
+
+void TankWorld::OnKeyUp(int vk)
+{
+	if(vk == VK::A || vk == VK::D) {
+		m_tank->StopRotate();
+	}
+	if(vk == VK::W || vk == VK::S) {
+		m_tank->StopMove();
 	}
 }
 
@@ -120,4 +164,20 @@ void TankWorld::OnMouseWheel(long x, long y, long delta)
 	} else {
 		m_camera->MoveBackward(10);
 	}
+}
+
+void TankWorld::SetGodView()
+{
+	m_view_type = E_GOD_VIEW;
+	GetRoot()->AddChild(m_camera);
+	m_camera->MoveTo(0, 100, -100);
+	m_camera->RotateTo(45, 0, 0);
+}
+
+void TankWorld::SetTankView()
+{
+	m_view_type = E_TANK_VIEW;
+	m_tank->AddChild(m_camera);
+	m_camera->MoveTo(0, 200, 200);
+	m_camera->RotateTo(45, 180, 0);
 }
