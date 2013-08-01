@@ -83,8 +83,8 @@ namespace engine {
 
 		// internal
 		protected:
-			D3DXMATRIX iGetWorldMatrix();
-			D3DXMATRIX iGetLocalMatrix();
+			virtual D3DXMATRIX iGetWorldMatrix();
+			virtual D3DXMATRIX iGetLocalMatrix();
 
 		private:
 			void RemoveChild(GameObject * child);
