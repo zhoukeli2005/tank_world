@@ -84,6 +84,21 @@ void Screen::iUpdate()
 		rect.bottom = 100;
 		m_font->DrawText(NULL, buf, -1, &rect, DT_LEFT, D3DCOLOR_XRGB(0xFF, 0x00, 0x00));
 
+		// draw introduction
+		rect.left = 200;
+		rect.top = 10;
+		rect.right = rect.left + 1000;
+		rect.bottom = 100;
+		m_font->DrawText(NULL, "ASWD - ÒÆ¶¯£¬J - ¹¥»÷£¬K - ÐîÁ¦¹¥»÷£¬¿Õ¸ñ - ÇÐ»»ÊÓ½Ç", 
+			-1, &rect, DT_LEFT, D3DCOLOR_XRGB(0x00, 0x00, 0x00));
+
+		rect.left = 200;
+		rect.top = 30;
+		rect.right = rect.left + 1000;
+		rect.bottom = 200;
+		m_font->DrawText(NULL, "Êó±êµã»÷²¢ÍÏ¶¯ - »·¹Ë£¬Êó±ê»¬ÂÖ - Ëõ·Å", 
+			-1, &rect, DT_LEFT, D3DCOLOR_XRGB(0x00, 0x00, 0x00));
+
 		// draw Fire Energy
 		if(m_fire_energy > 0) {
 			memset(buf, 0, sizeof(buf));

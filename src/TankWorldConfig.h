@@ -23,6 +23,8 @@ namespace game
 	const int TerrainSize = 10;
 	const int TerrainMinRange = 200;
 	const int TerrainMaxRange = 400;
+
+	const int LogoHeight = 2000;
 }
 
 #endif

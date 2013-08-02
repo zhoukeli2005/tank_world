@@ -45,6 +45,11 @@ namespace engine {
 
 			void SetRemark(const char * p)
 			{
+				if(!p) {
+					m_remark_time = 0;
+					m_remark[0] = 0;
+					return;
+				}
 				memcpy(m_remark, p, strlen(p) + 1);
 				m_remark_time = GetTickCount();
 			}

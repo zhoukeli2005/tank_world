@@ -64,12 +64,20 @@ namespace game
 			};
 			enum {
 				E_GAME_INIT,
+					E_GAME_INIT_1,	// move camera
+					E_GAME_INIT_2,	// rotate camera
+					E_GAME_INIT_3,	// rotate camera
+					E_GAME_INIT_4,	// move camera
+					E_GAME_INIT_5,	// press any key to start
 				E_GAME_NORMAL
 			};
 			void SetGodView();
 			void SetTankView();
 			void CreateMissile(int velocity);
 			float GetFireEnergy();
+
+			void StartLogoPresent();
+			void DoLogoPresent(int delta);
 
 		private:
 			engine::Camera			* m_camera;
@@ -93,8 +101,11 @@ namespace game
 			long m_mouse_posY;
 			int m_mouse_down;
 
-			// view type
+			// view type - god view or tank view
 			int m_view_type;
+
+			// game state -- init or normal
+			int m_game_state;
 
 			long m_last_update_time;
 			int m_start_fire_time;

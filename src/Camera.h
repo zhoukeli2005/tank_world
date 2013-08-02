@@ -11,7 +11,7 @@ namespace engine
 	class Camera : public GameObject
 	{
 		public:
-			Camera(Screen * scn):GameObject(scn) {}
+			Camera(Screen * scn):GameObject(scn), m_use_lookat(0) {}
 
 		public:
 			~Camera() {}
@@ -33,6 +33,8 @@ namespace engine
 			
 			virtual void Rotate(float dx, float dy, float dz)
 			{
+				m_use_lookat = 0;
+
 				GameObject::Rotate(dx, dy, dz);
 
 				iRefresh();
@@ -41,6 +43,14 @@ namespace engine
 			virtual void RotateTo(float x, float y, float z)
 			{
 				GameObject::RotateTo(x, y, z);
+
+				iRefresh();
+			}
+
+			void LookAt(const math::Vector v)
+			{
+				m_use_lookat = 1;
+				m_lookat = v;
 
 				iRefresh();
 			}
@@ -57,9 +67,22 @@ namespace engine
 					return;
 				}
 
+				if(m_use_lookat) {
+					math::Vector pos = GetGlobalPosition();
+					D3DXVECTOR3 vpos(pos.x, pos.y, pos.z);
+
+					D3DXVECTOR3 up(0, 1, 0);
+					D3DXVECTOR3 lookat(m_lookat.x, m_lookat.y, m_lookat.z);
+
+					D3DXMATRIX matrix;
+					D3DXMatrixLookAtLH(&matrix, &vpos, &lookat, &up);
+					m_device->SetTransform(D3DTS_VIEW, &matrix);
+					return;
+				}
+
 				D3DXMATRIX world_matrix = iGetWorldMatrix();
 				if(world_matrix == m_last_world_matrix) {
-	//				return;
+					return;
 				}
 
 				m_last_world_matrix = world_matrix;
@@ -91,6 +114,9 @@ namespace engine
 
 		private:
 			D3DXMATRIX	m_last_world_matrix;
+
+			int m_use_lookat;
+			math::Vector m_lookat;
 	};
 }
 

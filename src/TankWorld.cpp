@@ -8,6 +8,7 @@
 #include "Missile.h"
 #include "EnemyTank.h"
 #include "Util.h"
+#include "GameLogo.h"
 
 using namespace game;
 
@@ -38,7 +39,7 @@ void TankWorld::Start()
 
 	// sun light
 	m_sun_light = new engine::DirectionalLight(this);
-	m_sun_light->SetDirection(0, -10, 0);
+	m_sun_light->SetDirection(0, 0, 10);
 
 	// platform
 	m_platform = new engine::MeshGameObject(this);
@@ -77,8 +78,14 @@ void TankWorld::Start()
 		CreateNewTank();
 	}
 
+	// Logo
+	GameLogo * logo = new GameLogo(this);
+	GetRoot()->AddChild(logo);
+	logo->MoveTo(0, LogoHeight, 0);
 
-	SetTankView();
+	// show logo
+	m_game_state = E_GAME_INIT_1;
+	StartLogoPresent();
 }
 
 void TankWorld::iEnterFrame()
@@ -103,10 +110,18 @@ void TankWorld::iEnterFrame()
 
 		SetFireEnergy(v);
 	}
+
+	// show logo
+	if(m_game_state != E_GAME_NORMAL) {
+		DoLogoPresent(delta);
+	}
 }
 
 void TankWorld::OnLButtonDown(long x, long y)
 {
+	if(m_game_state != E_GAME_NORMAL) {
+		return;
+	}
 	if(!m_mouse_down) {
 		m_mouse_down = 1;
 		m_mouse_posX = x;
@@ -116,11 +131,17 @@ void TankWorld::OnLButtonDown(long x, long y)
 
 void TankWorld::OnLButtonUp(long x, long y)
 {
+	if(m_game_state != E_GAME_NORMAL) {
+		return;
+	}
 	m_mouse_down = 0;
 }
 
 void TankWorld::OnMouseMove(long x, long y)
 {
+	if(m_game_state != E_GAME_NORMAL) {
+		return;
+	}
 	if(!m_mouse_down) {
 		return;
 	}
@@ -133,6 +154,14 @@ void TankWorld::OnMouseMove(long x, long y)
 
 void TankWorld::OnKeyDown(int vk)
 {
+	if(m_game_state != E_GAME_NORMAL) {
+		if(m_game_state == E_GAME_INIT_5) {
+			m_game_state = E_GAME_NORMAL;
+			SetTankView();
+			SetRemark(NULL);
+		}
+		return;
+	}
 	if(vk == VK::A) {
 	//	m_tank->Rotate(0, -2, 0);
 		m_tank->StartRotate(-40);
@@ -179,6 +208,9 @@ void TankWorld::OnKeyDown(int vk)
 
 void TankWorld::OnKeyUp(int vk)
 {
+	if(m_game_state != E_GAME_NORMAL) {
+		return;
+	}
 	if(vk == VK::A || vk == VK::D) {
 		m_tank->StopRotate();
 	}
@@ -198,6 +230,9 @@ void TankWorld::OnKeyUp(int vk)
 
 void TankWorld::OnMouseWheel(long x, long y, long delta)
 {
+	if(m_game_state != E_GAME_NORMAL) {
+		return;
+	}
 	if(delta > 0) {
 		m_camera->MoveForward(10);
 	} else {
@@ -208,9 +243,10 @@ void TankWorld::OnMouseWheel(long x, long y, long delta)
 void TankWorld::SetGodView()
 {
 	m_view_type = E_GOD_VIEW;
+	math::Vector pos = m_tank->GetGlobalPosition();
 	GetRoot()->AddChild(m_camera);
-	m_camera->MoveTo(0, 600, -600);
-	m_camera->RotateTo(35, 0, 0);
+	m_camera->MoveTo(pos.x, 500, pos.z);
+	m_camera->RotateTo(80, 0, 0);
 }
 
 void TankWorld::SetTankView()
@@ -280,4 +316,62 @@ float TankWorld::GetFireEnergy()
 	float v = delta / 1000.0;
 
 	return v;
+}
+
+void TankWorld::StartLogoPresent()
+{
+	GetRoot()->AddChild(m_camera);
+	m_camera->Move(15, LogoHeight - 3, 0);
+}
+
+void TankWorld::DoLogoPresent(int delta)
+{
+	if(m_game_state == E_GAME_INIT) {
+		m_game_state = E_GAME_INIT_1;
+	}
+	if(m_game_state == E_GAME_INIT_1) {
+		if(m_camera->GetLocalPosition().z > -5) {
+			m_camera->MoveBackward(delta * 0.001 * 1);
+		} else if (m_camera->GetLocalPosition().z > - 50) {
+			static float v = 1;
+			v = min(5, v + 1 * delta * 0.001);
+			m_camera->MoveBackward(delta * 0.001 * v);
+		} else {
+			m_game_state = E_GAME_INIT_2;
+		}
+	}
+	if(m_game_state == E_GAME_INIT_2) {
+		if(m_camera->GetLocalRotate().y < 5) {
+			m_camera->Rotate(0, 1 * delta * 0.001, 0);
+		} else {
+			m_game_state = E_GAME_INIT_3;
+		}
+	}
+	if(m_game_state == E_GAME_INIT_3) {
+		if(m_camera->GetLocalRotate().x < 80) {
+			m_camera->Rotate(10 * delta * 0.001, 0, 0);
+		} else {
+			m_game_state = E_GAME_INIT_4;
+		}
+	}
+	if(m_game_state == E_GAME_INIT_4) {
+		if(m_camera->GetLocalPosition().y > 200) {
+			math::Vector pos = m_tank->GetGlobalPosition();
+			math::Vector mypos = m_camera->GetGlobalPosition();
+			static float move_velocity = 1;
+			move_velocity = min(300, move_velocity + delta * 0.001 * 100);
+			m_camera->MoveToward(move_velocity * delta * 0.001, math::Vector(pos.x - mypos.x, pos.y - mypos.y, pos.z - mypos.z));
+		} else {
+			m_game_state = E_GAME_INIT_5;
+		}
+	}
+	if(m_game_state == E_GAME_INIT_5) {
+		math::Vector pos = m_tank->GetGlobalPosition();
+		math::Vector mypos = m_camera->GetGlobalPosition();
+		if(pos.x != mypos.x || pos.z != mypos.z) {
+			float dis = abs(pos.x - mypos.x) + abs(pos.z - mypos.z);
+			m_camera->MoveToward(dis * delta * 0.001 * 0.5, math::Vector(pos.x - mypos.x, 0, pos.z - mypos.z));
+		}
+		SetRemark("按键盘任意键继续");
+	}
 }

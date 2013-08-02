@@ -84,6 +84,7 @@
     <ClInclude Include="..\..\src\CubeGameObject.h" />
     <ClInclude Include="..\..\src\DirectionalLight.h" />
     <ClInclude Include="..\..\src\EnemyTank.h" />
+    <ClInclude Include="..\..\src\GameLogo.h" />
     <ClInclude Include="..\..\src\GameObject.h" />
     <ClInclude Include="..\..\src\MeshGameObject.h" />
     <ClInclude Include="..\..\src\Missile.h" />

@@ -24,7 +24,7 @@ namespace engine
 				ZeroMemory( &mtrl, sizeof(mtrl) );
 				mtrl.Diffuse.r = mtrl.Ambient.r = 1.0f;
 				mtrl.Diffuse.g = mtrl.Ambient.g = 1.0f;
-				mtrl.Diffuse.b = mtrl.Ambient.b = 0.0f;
+				mtrl.Diffuse.b = mtrl.Ambient.b = 1.0f;
 				mtrl.Diffuse.a = mtrl.Ambient.a = 1.0f;
 				m_device->SetMaterial( &mtrl );
 
@@ -56,7 +56,7 @@ namespace engine
 				m_device->SetLight(0, &light);
 				m_device->LightEnable(0, TRUE);
 
-				m_device->SetRenderState( D3DRS_AMBIENT, 0x00202020 );
+			//	m_device->SetRenderState( D3DRS_AMBIENT, 0x00202020 );
 			}
 	};
 }
