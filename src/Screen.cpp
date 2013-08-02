@@ -13,14 +13,39 @@ Screen::Screen(HINSTANCE hinstance, int width, int height)
 ,m_pdevice9(NULL)
 ,m_pd3d9(NULL)
 ,m_root(NULL)
+,m_last_draw(0)
 ,m_width(width)
 ,m_height(height)
 ,m_near(1)
 ,m_far(10000)
+,m_fps(0)
+,m_fire_energy(0)
+,m_fps_time(0)
+,m_fps_count(0)
+,m_remark_time(0)
 {
+	// create window & d3d
 	iCreateWindow();
 
+	// create font
+	D3DXCreateFont(m_pdevice9,
+		18, 18,	// height, width
+		500,	// bold
+		1,		// Mipmap
+		0,		// ÊÇ·ñÐ±Ìå
+		DEFAULT_CHARSET, 
+		OUT_TT_ONLY_PRECIS,
+		DEFAULT_QUALITY,
+		DEFAULT_PITCH | FF_DONTCARE,
+		"Arial", 
+		&m_font);
+
 	m_root = new GameObject(this);
+}
+
+Screen::~Screen()
+{
+
 }
 
 void Screen::iUpdate()
@@ -28,16 +53,68 @@ void Screen::iUpdate()
 	if(!m_root || !m_pdevice9) {
 		return;
 	}
+	
+	int now = GetTickCount();
 
-	m_pdevice9->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER,
-		D3DCOLOR_COLORVALUE(1.0f,1.0f,1.0f,1.0f), 1.0f, 0 );
+	if(now - m_last_draw > 10) {
 
-	m_pdevice9->BeginScene();
+		calculateFPS(now);
 
-	m_root->Draw();
+		m_last_draw = now;
 
-	m_pdevice9->EndScene();
-	m_pdevice9->Present(NULL, NULL, NULL, NULL);
+		m_pdevice9->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER,
+			D3DCOLOR_COLORVALUE(1.0f,1.0f,1.0f,1.0f), 1.0f, 0 );
+
+		m_pdevice9->BeginScene();
+
+		m_root->Draw();
+
+		RECT rect;
+
+		// draw fps
+
+		char buf[32];
+		memset(buf, 0, sizeof(buf));
+		memcpy(buf, "FPS:", 4);
+		itoa((int)m_fps, buf + 4, 10);
+
+		rect.left = 10;
+		rect.top = 10;
+		rect.right = rect.left + 1000;
+		rect.bottom = 100;
+		m_font->DrawText(NULL, buf, -1, &rect, DT_LEFT, D3DCOLOR_XRGB(0xFF, 0x00, 0x00));
+
+		// draw Fire Energy
+		if(m_fire_energy > 0) {
+			memset(buf, 0, sizeof(buf));
+			const char * p = "ÐîÁ¦:";
+			int len = strlen(p);
+			memcpy(buf, p, len);
+			sprintf(buf + len, "%.2f", m_fire_energy);
+
+			rect.left = m_width / 2 - 100;
+			rect.top = m_height / 2;
+			rect.right = rect.left + 1000;
+			rect.bottom = rect.top + 100;
+			m_font->DrawText(NULL, buf, -1, &rect, DT_LEFT, D3DCOLOR_XRGB(0xFF, 0xFF, 0x00));
+		}
+
+		// draw Remark
+		if(m_remark_time > 0) {
+			if(now - m_remark_time < 3000) {
+				rect.left = m_width / 2 + 100;
+				rect.top = m_height / 2;
+				rect.right = rect.left + 1000;
+				rect.bottom = rect.top + 100;
+				m_font->DrawText(NULL, m_remark, -1, &rect, DT_LEFT, D3DCOLOR_XRGB(0x00, 0xFF, 0xFF));
+			} else {
+				m_remark_time = 0;
+			}
+		}
+
+		m_pdevice9->EndScene();
+		m_pdevice9->Present(NULL, NULL, NULL, NULL);
+	}
 
 	iEnterFrame();
 }
@@ -250,4 +327,20 @@ LRESULT CALLBACK Screen::WindowProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
 	}
 
 	return 0;
+}
+
+void Screen::calculateFPS(int now)
+{
+	if(!m_fps_time) {
+		m_fps_time = now;
+	} else {
+		m_fps_count++;
+		if(now - m_fps_time >= 1000) {
+			m_fps = m_fps_count;
+
+			m_fps_count = 0;
+			m_fps_time = 0;
+		}
+	}
+
 }

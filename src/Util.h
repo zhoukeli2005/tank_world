@@ -16,6 +16,114 @@ namespace math
 
 				return D3DXVECTOR3(v4.x, v4.y, v4.z);
 			}
+
+			static void Init()
+			{
+				int i;
+				for(i = 0; i < 90; ++i) {
+					float r = D3DXToRadian(i);
+					m_sin[i] = sin(r);
+					m_cos[i] = cos(r);
+					m_tan[i] = tan(r);
+				}
+			}
+
+			static float quick_sin(float degree)
+			{
+				while(degree < 0) {
+					degree += 360;
+				}
+				while(degree >= 360) {
+					degree -= 360;
+				}
+
+				int sgn = 1;
+				if(degree > 90 && degree <= 180) {
+					degree = 180 - degree;
+				} else if (degree > 180 && degree <= 270) {
+					degree = degree - 180;
+					sgn = -1;
+				} else if (degree > 270) {
+					degree = 360 - degree;
+					sgn = -1;
+				}
+
+				if(degree == 90) {
+					return 1;
+				}
+
+				return m_sin[(int)degree] * sgn;
+			}
+
+			static float quick_cos(float degree)
+			{
+				while(degree < 0) {
+					degree += 360;
+				}
+				while(degree >= 360) {
+					degree -= 360;
+				}
+
+				int sgn = 1;
+				if(degree > 90 && degree <= 180) {
+					degree = 180 - degree;
+					sgn = -1;
+				} else if (degree > 180 && degree <= 270) {
+					degree = degree - 180;
+					sgn = -1;
+				} else if (degree > 270) {
+					degree = 360 - degree;
+				}
+
+				if(degree == 90) {
+					return 0;
+				}
+
+				return m_cos[(int)degree] * sgn;
+			}
+/*
+			
+						static float quick_acos(float v)
+						{
+							int sgn = 1;
+							if(v < 0) {
+								v *= -1;
+								sgn = -1;
+							}
+			
+							if(v == 1) {
+								return 0;
+							}
+							if(v == -1) {
+								return 180;
+							}
+							if(v == 0) {
+								return 90;
+							}
+			
+							// binary search
+							int low, high, mid;
+							low = 0;
+							high = 89;
+							while(low <= high) {
+								mid = (low + high) / 2;
+								if(m_cos[mid] == v) {
+									return mid;
+								}
+								if(m_cos[mid] > v) {
+									low = mid + 1;
+									continue;
+								}
+								high = mid - 1;
+							}
+							return mid;
+						}*/
+			
+
+		private:
+			static float m_sin[90];
+			static float m_cos[90];
+			static float m_tan[90];
 	};
 }
 

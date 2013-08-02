@@ -1,0 +1,9 @@
+﻿Build started 2013/8/2 18:11:34.
+     1>Project "E:\homework\git\build\tank_world\tank_world.vcxproj" on node 2 (clean target(s)).
+     1>_PrepareForClean:
+         Deleting file "Release\tank_world.lastbuildstate".
+     1>Done Building Project "E:\homework\git\build\tank_world\tank_world.vcxproj" (clean target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.04

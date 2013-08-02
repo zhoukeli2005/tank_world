@@ -152,10 +152,12 @@ namespace engine
 					m_children[7] = new OctTreeNode(curr_left_down, curr_left_down + delta);
 
 					// reset children
+					/*
 					OctTreeData * n = m_first_data;
 					m_first_data = NULL;
 					m_data_count = 0;
 
+					
 					while(n) {
 						OctTreeData * next = n->m_oct_tree_next;
 						n->m_oct_tree_node = NULL;
@@ -164,7 +166,7 @@ namespace engine
 						AddOctTreeData(n, direction);
 
 						n = next;
-					}
+					}*/
 				}
 
 				OctTreeData * conflict = NULL;
@@ -189,12 +191,8 @@ namespace engine
 						if(tmp && !conflict) {
 							conflict = tmp;
 						}
-						break;;
+						break;
 					}
-				}
-
-				if(conflict) {
-					conflict->OctTreeConflict(d, direction);
 				}
 
 				if(succ) {
@@ -230,7 +228,7 @@ namespace engine
 		public:
 			OctTree()
 			{
-				m_root = new OctTreeNode(math::Vector(-10000, -10000, -10000), math::Vector(10000, 10000, 10000));
+				m_root = new OctTreeNode(math::Vector(-2000, -2000, -2000), math::Vector(2000, 2000, 2000));
 			}
 
 		public:
@@ -251,7 +249,12 @@ namespace engine
 			 */
 			OctTreeData * CheckConflict(OctTreeData * d, math::Vector direction)
 			{
-				return m_root->AddOctTreeData(d, direction);
+				OctTreeData * other = m_root->AddOctTreeData(d, direction);
+				if(other) {
+					other->OctTreeConflict(d, direction);
+				}
+
+				return other;
 			}
 
 		private:

@@ -58,6 +58,15 @@ namespace engine {
 				return l - o;
 			}
 
+			virtual math::Vector ToLocalPosition(const math::Vector & v);
+			virtual math::Vector ToLocalVector(const math::Vector & v)
+			{
+				math::Vector o = ToLocalPosition(math::Vector(0, 0, 0));
+				math::Vector l = ToLocalPosition(v);
+
+				return l - o;
+			}
+
 			virtual math::Vector GetLocalRotate();
 
 			virtual math::Vector GetLocalScale();
@@ -91,13 +100,14 @@ namespace engine {
 
 		// members -- cannot access from children
 		private:
-			GameObject *	m_parent;
 			GameObject *	m_first_child;
 			GameObject *	m_sibling;
 
 			math::Vector	m_origin_face;
 
 			int m_is_removing;
+
+			int m_last_draw;
 
 			// reference count
 			int m_ref_count;
@@ -106,6 +116,8 @@ namespace engine {
 		protected:
 			Screen *		m_screen;
 			LPDIRECT3DDEVICE9	m_device;
+
+			GameObject *	m_parent;
 
 			math::Vector	m_position;
 			math::Vector	m_rotate;

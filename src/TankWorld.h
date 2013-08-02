@@ -16,6 +16,8 @@
 namespace game
 {
 	class Missile;
+	class PlayerTank;
+	class EnemyTank;
 
 	class TankWorld : public engine::Screen
 	{
@@ -37,7 +39,7 @@ namespace game
 			void OnKeyDown(int vk);
 			void OnKeyUp(int vk);
 
-		// must override
+		// interface
 		public:
 			engine::Camera * GetMainCamera()
 			{
@@ -49,6 +51,9 @@ namespace game
 				return m_scene_octree;
 			}
 
+			void CreateNewTank();
+
+		// update every frame
 		protected:
 			virtual void iEnterFrame();
 
@@ -57,9 +62,14 @@ namespace game
 				E_GOD_VIEW,
 				E_TANK_VIEW
 			};
+			enum {
+				E_GAME_INIT,
+				E_GAME_NORMAL
+			};
 			void SetGodView();
 			void SetTankView();
-
+			void CreateMissile(int velocity);
+			float GetFireEnergy();
 
 		private:
 			engine::Camera			* m_camera;
@@ -69,13 +79,14 @@ namespace game
 			engine::DirectionalLight * m_sun_light;
 
 			// game 
-			game::Tank * m_tank;
+			game::PlayerTank * m_tank;
 			engine::MeshGameObject * m_platform;
 			engine::MeshGameObject * m_terrain;
 
 			engine::OctTree * m_scene_octree;
 
 			Missile * m_missile;
+			EnemyTank * m_enemy;
 
 			// control
 			long m_mouse_posX;
@@ -84,6 +95,9 @@ namespace game
 
 			// view type
 			int m_view_type;
+
+			long m_last_update_time;
+			int m_start_fire_time;
 	};
 }
 

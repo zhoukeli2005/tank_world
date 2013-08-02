@@ -96,8 +96,6 @@ void MeshGameObject::Draw()
 
 void MeshGameObject::Copy(MeshGameObject * m)
 {
-//	MeshGameObject * m = new MeshGameObject(m_screen);
-
 	m->m_count = m_count;
 
 	m_mesh->AddRef();

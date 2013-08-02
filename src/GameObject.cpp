@@ -19,6 +19,7 @@ GameObject::GameObject(Screen * scn)
 ,m_vertex_count(0)
 ,m_origin_face(0, 0, 1)
 ,m_is_removing(0)
+,m_last_draw(0)
 {
 	m_device = m_screen->GetDevice();
 }
@@ -52,7 +53,9 @@ void GameObject::Draw()
 	child = m_first_child;
 	while(child) {
 		GameObject * next = child->m_sibling;
-		child->Draw();
+		if(!child->m_is_removing) {
+			child->Draw();
+		}
 		child = next;
 	}
 
@@ -149,6 +152,21 @@ math::Vector GameObject::ToGlobalPosition(const math::Vector & v)
 	D3DXMATRIX matrix = iGetWorldMatrix();
 	D3DXVECTOR3 v3(v.x, v.y, v.z);
 	D3DXVECTOR3 out3 = math::Util::vect3transform(v3, matrix);
+
+	return math::Vector(out3.x, out3.y, out3.z);
+}
+
+math::Vector GameObject::ToLocalPosition(const math::Vector & v)
+{
+	D3DXMATRIX matrix = iGetWorldMatrix();
+	D3DXMATRIX m;
+	D3DXMatrixInverse(&m, NULL, &matrix);
+
+	if(!m) {
+		return math::Vector(0, 0, 1);
+	}
+	D3DXVECTOR3 v3(v.x, v.y, v.z);
+	D3DXVECTOR3 out3 = math::Util::vect3transform(v3, m);
 
 	return math::Vector(out3.x, out3.y, out3.z);
 }

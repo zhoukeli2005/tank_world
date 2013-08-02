@@ -5,6 +5,7 @@
 #include "MeshGameObject.h"
 #include "OctTree.h"
 #include "TankWorld.h"
+#include "Util.h"
 
 namespace game
 {
@@ -17,6 +18,7 @@ namespace game
 				, OctTreeData(flags)
 				, m_curr_velocity()
 				, m_last_time(0)
+				, m_last_face_time(0)
 			{
 				m_tank_world = (TankWorld *)scn;
 				ScaleTo(0.03, 0.03, 0.03);
@@ -39,7 +41,6 @@ namespace game
 				m_start_time = GetTickCount();
 
 				m_curr_velocity = m_dir * m_velocity;
-
 				ResetFace(m_curr_velocity);
 			}
 
@@ -47,7 +48,9 @@ namespace game
 		public:
 			virtual math::AABB OctTreeGetBoundBox()
 			{
-				math::AABB local = GetBoundBox();
+				math::AABB local;
+				local.SetMin(math::Vector(-1, -1, -1));
+				local.SetMax(math::Vector(1, 1, 1));
 
 				math::Vector pos = GetGlobalPosition();
 
@@ -114,18 +117,22 @@ namespace game
 
 				float delta = (now - m_last_time) * 0.001;
 
+				if(delta < 0.01) {
+					return;
+				}
+
 				m_last_time = now;
 
 				// 移动
 				math::Vector dis = m_curr_velocity * delta;
-				
+								
 				Move(dis.x, dis.y, dis.z);
 
 				// 改变速度
-				m_curr_velocity += math::Vector(0, -5 * delta, 0);
+				m_curr_velocity += math::Vector(0, -100 * delta, 0);
 
 				// 消失
-				if(now - m_start_time > 30000) {
+				if(now - m_start_time > MissileExistDuration) {
 					Dispear();
 				}
 			}
@@ -140,39 +147,6 @@ namespace game
 			}
 
 		protected:
-			virtual D3DXMATRIX iGetLocalMatrix()
-			{
-				D3DXMATRIX mscale, mrotate, mtrans, out;
-	
-				D3DXMatrixScaling(&mscale, m_scale.x, m_scale.y, m_scale.z);
-
-			//	D3DXMatrixRotationYawPitchRoll(&mrotate, D3DXToRadian(m_rotate.y), D3DXToRadian(m_rotate.x), D3DXToRadian(m_rotate.z));
-				// 自传
-				static int angle = 0;
-				D3DXMatrixIdentity(&mrotate);
-		//		D3DXMatrixRotationX(&mrotate, angle++);
-
-				D3DXMATRIX tmp;
-				float a = atan(-m_curr_velocity.y / m_curr_velocity.x);
-				float x = cos(a) - sin(a);
-				float z = sin(a) + cos(a);
-
-				float b = math::Vector(x, 0, z) * math::Vector(1, 0, 0);
-				b = acos(b);
-
-				D3DXMatrixRotationY(&tmp, b);
-
-				mrotate *= tmp;
-
-				D3DXMatrixRotationZ(&tmp, -a);
-				mrotate *= tmp;
-
-				D3DXMatrixTranslation(&mtrans, m_position.x, m_position.y, m_position.z);
-
-				out = mscale * mrotate * mtrans;
-
-				return out;
-			}
 
 		private:
 			void Dispear()
@@ -186,7 +160,6 @@ namespace game
 				// 3. drop
 				Drop();
 			}
-
 
 			// 将导弹方向设置为其运动轨迹切线
 			void ResetFace(const math::Vector & dir)
@@ -214,6 +187,8 @@ namespace game
 			math::Vector m_curr_velocity;
 
 			math::Vector m_origin_pos;
+
+			int m_last_face_time;
 	};
 }
 

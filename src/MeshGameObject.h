@@ -39,6 +39,16 @@ namespace engine
 
 				return *m_local_aabb;
 			}
+			
+			float GetXWidth()
+			{
+				return GetBoundBox().GetMax().x - GetBoundBox().GetMin().x;
+			}
+
+			float GetZWidth()
+			{
+				return GetBoundBox().GetMax().z - GetBoundBox().GetMin().z;
+			}
 
 		protected:
 			LPD3DXMESH		m_mesh;

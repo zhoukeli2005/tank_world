@@ -6,11 +6,18 @@
 #include "Config.h"
 #include "PlayerTank.h"
 #include "Missile.h"
+#include "EnemyTank.h"
+#include "Util.h"
 
 using namespace game;
 
 void TankWorld::Start()
 {
+	int now = GetTickCount();
+	srand(time(NULL) * now);
+	m_last_update_time = now;
+	m_start_fire_time = 0;
+
 	// oct tree
 	m_scene_octree = new engine::OctTree();
 
@@ -37,44 +44,65 @@ void TankWorld::Start()
 	m_platform = new engine::MeshGameObject(this);
 	m_platform->LoadFromFile(".\\resource\\platform\\platform.x");
 	GetRoot()->AddChild(m_platform);
-	m_platform->MoveTo(0, 500, 0);
+	m_platform->MoveTo(0, 50, 0);
 
 	// terrain
 	m_terrain = new MeshGameObject(this);
 	m_platform->Copy(m_terrain);
-	m_terrain->ScaleTo(10, 10, 10);
+	m_terrain->ScaleTo(TerrainSize, TerrainSize, TerrainSize);
 
 	GetRoot()->AddChild(m_terrain);
 	m_terrain->MoveTo(0, -200, 0);
 
 	// tank
-	m_tank = new PlayerTank(this, E_TT_TANK_PLAYER);
+	m_tank = new PlayerTank(this);
 	m_tank->LoadFromFile(".\\resource\\tank\\tank1.x");
-	m_tank->MoveTo(0, 50, 0);
+
+	m_tank->SetRange(m_platform->GetXWidth() / 2 - m_tank->GetZWidth());
+	m_tank->MoveTo(0, m_platform->GetBoundBox().GetMax().y, 0);
 	m_tank->SetOriginFaceDirection(0, 0, -1);
 
 	m_platform->AddChild(m_tank);
-	
-//	Missile * missile = new Missile(this, E_TT_MISSILE_PLAYER);
-//	missile->LoadFromFile(".\\resource\\missile\\m1.x");
-//	GetRoot()->AddChild(missile);
-//	missile->ScaleTo(0.03, 0.03, 0.03);
-//	missile->Start(math::Vector(50, 600, 0), math::Vector(0, 0, 1), 10);
 
 	// init missile
 	m_missile = new Missile(this, E_TT_MISSILE_PLAYER);
 	m_missile->LoadFromFile(".\\resource\\missile\\m1.x");
 
-	SetGodView();
+	// enemy
+	m_enemy = new EnemyTank(this);
+	m_enemy->LoadFromFile(".\\resource\\tank\\tank1.x");
+
+	int i;
+	for(i = 0; i < MaxEnemyCount; ++i) {
+		CreateNewTank();
+	}
+
+
+	SetTankView();
 }
 
 void TankWorld::iEnterFrame()
 {
+	int now = GetTickCount();
+
+	int delta = now - m_last_update_time;
+	m_last_update_time = now;
+
 	int range = 500;
-//	m_platform->Rotate(0, 0.03, 0);
+	m_platform->Rotate(0, delta * 0.001 * 1, 0);
 
 	math::Vector rotate = m_platform->GetLocalRotate();
-//	m_platform->MoveTo(range * sin(D3DXToRadian(rotate.y)), m_platform->GetLocalPosition().y, range * cos(D3DXToRadian(rotate.y)));
+
+	float posX = range * cos(D3DXToRadian(rotate.y));
+	float posZ = range * sin(D3DXToRadian(rotate.y));
+	m_platform->MoveTo(posX, m_platform->GetLocalPosition().y, posZ);
+
+	// 蓄力
+	if(m_start_fire_time) {
+		float v = GetFireEnergy();
+
+		SetFireEnergy(v);
+	}
 }
 
 void TankWorld::OnLButtonDown(long x, long y)
@@ -131,15 +159,17 @@ void TankWorld::OnKeyDown(int vk)
 		}
 	}
 
-	if(vk == VK::J) {
-		m_tank->StartFire();
+	if(vk == VK::J) {		
+		if(m_tank->StartFire()) {
+			CreateMissile(MissileVelocity);
+		}
+	}
 
-		Missile * m = m_missile->CopyMissile();
-		GetRoot()->AddChild(m);
-		math::Vector pos = m_tank->ToGlobalPosition(math::Vector(-3, 10, -52));
-		D3DXVECTOR3 face3 = m_tank->GetFaceDirectionGlobal();
-		math::Vector face(face3.x, face3.y, face3.z);
-		m->Start(pos, face, 20);
+	if(vk == VK::K) {
+		// 开始蓄力
+		if(!m_start_fire_time) {
+			m_start_fire_time = GetTickCount();
+		}
 	}
 
 	if(vk == VK::G) {
@@ -154,6 +184,15 @@ void TankWorld::OnKeyUp(int vk)
 	}
 	if(vk == VK::W || vk == VK::S) {
 		m_tank->StopMove();
+	}
+	if(vk == VK::K) {
+		float v = GetFireEnergy();
+		m_start_fire_time = 0;
+
+		if(m_tank->StartFire()) {
+			CreateMissile(v * MissileVelocity);
+		}
+		SetFireEnergy(0);
 	}
 }
 
@@ -170,14 +209,75 @@ void TankWorld::SetGodView()
 {
 	m_view_type = E_GOD_VIEW;
 	GetRoot()->AddChild(m_camera);
-	m_camera->MoveTo(0, 100, -100);
-	m_camera->RotateTo(45, 0, 0);
+	m_camera->MoveTo(0, 600, -600);
+	m_camera->RotateTo(35, 0, 0);
 }
 
 void TankWorld::SetTankView()
 {
 	m_view_type = E_TANK_VIEW;
 	m_tank->AddChild(m_camera);
-	m_camera->MoveTo(0, 200, 200);
-	m_camera->RotateTo(45, 180, 0);
+	m_camera->MoveTo(0, 80, 120);
+	m_camera->RotateTo(15, 180, 0);
+}
+
+void TankWorld::CreateNewTank()
+{
+	EnemyTank * enemy = m_enemy->CopyTank();
+	enemy->SetOriginFaceDirection(0, 0, -1);
+
+	// 有 10%的概率出生在平台上，90%概率出生在地面上
+	int r = (rand() % 100);
+	if(r < 10) {
+		// 出生在平台上
+
+		m_platform->AddChild(enemy);
+		enemy->SetWhere(E_WHERE_PLATFORM);
+
+		int range = m_platform->GetXWidth() / 2 - enemy->GetZWidth();
+		float posX = range * 0.8 * (rand() % 100) * 0.01;
+		float posZ = range * 0.8 * (rand() % 100) * 0.01;
+
+		m_platform->AddChild(enemy);
+		enemy->SetRange(range);
+		enemy->MoveTo(posX, m_platform->GetBoundBox().GetMax().y, posZ);
+		
+		return;
+	}
+
+	enemy->SetWhere(E_WHERE_TERRAIN);
+
+	int dis = TerrainMinRange + (TerrainMaxRange - TerrainMinRange) * (rand() % 100) * 0.01;
+	int a = rand() % 360;
+	float posX = math::Util::quick_cos(a) * dis;
+	float posZ = math::Util::quick_sin(a) * dis;
+
+	GetRoot()->AddChild(enemy);
+	enemy->SetRange(TerrainMaxRange);
+
+	math::Vector pos = math::Vector(0, m_terrain->GetBoundBox().GetMax().y, 0);
+	pos = m_terrain->ToGlobalPosition(pos);
+
+	enemy->MoveTo(posX, pos.y, posZ);
+}
+
+void TankWorld::CreateMissile(int velocity)
+{
+	Missile * m = m_missile->CopyMissile();
+	GetRoot()->AddChild(m);
+	math::Vector pos = m_tank->ToGlobalPosition(math::Vector(-3, 10, -55));
+	D3DXVECTOR3 face3 = m_tank->GetFaceDirectionGlobal();
+	math::Vector face(face3.x, face3.y, face3.z);
+	m->Start(pos, face, velocity);
+}
+
+float TankWorld::GetFireEnergy()
+{
+	int now = GetTickCount();
+	int delta = now - m_start_fire_time;
+	delta = min(3000, max(300, delta));
+
+	float v = delta / 1000.0;
+
+	return v;
 }

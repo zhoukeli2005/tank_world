@@ -90,6 +90,9 @@
     <ClInclude Include="..\..\src\PlayerTank.h">
       <Filter>include\game</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\EnemyTank.h">
+      <Filter>include\game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp">
@@ -112,6 +115,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Tank.cpp">
       <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Util.cpp">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

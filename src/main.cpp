@@ -4,6 +4,8 @@
 
 int WINAPI WinMain( __in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, __in LPSTR lpCmdLine, __in int nShowCmd )
 {
+	math::Util::Init();
+
 	game::TankWorld * tw = new game::TankWorld(hInstance, 1280, 800);
 
 	tw->Start();

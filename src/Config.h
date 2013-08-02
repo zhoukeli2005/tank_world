@@ -10,10 +10,13 @@
 #include <iostream>
 #include <string>
 
+#include <time.h>
+
 #pragma comment(lib, "d3d9.lib")
 #pragma comment(lib, "d3dx9.lib")
 
-#define Warning(str)	std::cout << __FILE__ << ":" << __LINE__ << "(" << __FUNCTION__ << ")" << str << std::endl
+#define Warning(str)
+//#define Warning(str)	std::cout << __FILE__ << ":" << __LINE__ << "(" << __FUNCTION__ << ")" << str << std::endl
 //#define  Warning(str)	throw str
 
 #endif

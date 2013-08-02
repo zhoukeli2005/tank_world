@@ -9,6 +9,20 @@ namespace game
 		E_TT_MISSILE_PLAYER,
 		E_TT_MISSILE_ENEMY
 	};
+
+	enum TANK_WHEAE {
+		E_WHERE_PLATFORM,
+		E_WHERE_TERRAIN
+	};
+
+	const int MissileExistDuration = 1000;
+	const int MissileVelocity = 400;
+
+	const int MaxEnemyCount = 5;
+
+	const int TerrainSize = 10;
+	const int TerrainMinRange = 200;
+	const int TerrainMaxRange = 400;
 }
 
 #endif

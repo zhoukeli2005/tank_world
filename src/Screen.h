@@ -31,6 +31,24 @@ namespace engine {
 
 			void Loop();
 
+		// interface ( GUI )
+		public:
+			void SetFPS(float fps)
+			{
+				m_fps = fps;
+			}
+
+			void SetFireEnergy(float energy)
+			{
+				m_fire_energy = energy;
+			}
+
+			void SetRemark(const char * p)
+			{
+				memcpy(m_remark, p, strlen(p) + 1);
+				m_remark_time = GetTickCount();
+			}
+
 		// must be overwrite
 		public:
 			virtual Camera * GetMainCamera() = 0;
@@ -56,6 +74,8 @@ namespace engine {
 
 			void iUpdate();
 
+			void calculateFPS(int now);
+
 		// for override
 		protected:
 			virtual void iEnterFrame() { }
@@ -66,6 +86,7 @@ namespace engine {
 			HWND				m_hwnd;
 			LPDIRECT3D9			m_pd3d9;
 			LPDIRECT3DDEVICE9	m_pdevice9;
+			LPD3DXFONT			m_font;
 
 			int m_width;
 			int m_height;
@@ -74,6 +95,18 @@ namespace engine {
 			float m_far;
 
 			GameObject *		m_root;
+
+			int m_last_draw;
+
+			int m_fps_time;
+			int m_fps_count;
+
+		// gui
+		private:
+			float m_fps;
+			float m_fire_energy;
+			char m_remark[256];
+			int m_remark_time;
 	};
 
 } // namespace engine
