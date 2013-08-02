@@ -19,6 +19,7 @@ namespace game
 				, m_curr_velocity()
 				, m_last_time(0)
 				, m_last_face_time(0)
+				, m_is_dispearing(0)
 			{
 				m_tank_world = (TankWorld *)scn;
 				ScaleTo(0.03, 0.03, 0.03);
@@ -116,11 +117,7 @@ namespace game
 				}
 
 				float delta = (now - m_last_time) * 0.001;
-
-				if(delta < 0.01) {
-					return;
-				}
-
+				
 				m_last_time = now;
 
 				// ÒÆ¶¯
@@ -151,6 +148,11 @@ namespace game
 		private:
 			void Dispear()
 			{
+				if(m_is_dispearing){
+					return;
+				}
+				m_is_dispearing = 1;
+
 				// 1. remove from screen
 				RemoveFromScreen();
 
@@ -189,6 +191,8 @@ namespace game
 			math::Vector m_origin_pos;
 
 			int m_last_face_time;
+
+			int m_is_dispearing;
 	};
 }
 

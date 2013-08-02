@@ -105,8 +105,6 @@ namespace engine {
 
 			math::Vector	m_origin_face;
 
-			int m_is_removing;
-
 			int m_last_draw;
 
 			// reference count
@@ -114,6 +112,8 @@ namespace engine {
 
 		// members -- can access from children
 		protected:
+			int m_is_removing;
+
 			Screen *		m_screen;
 			LPDIRECT3DDEVICE9	m_device;
 

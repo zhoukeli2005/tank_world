@@ -169,13 +169,13 @@ void Screen::Loop()
 
 	while( uMsg.message != WM_QUIT )
 	{
-		if( PeekMessage( &uMsg, NULL, 0, 0, PM_REMOVE ) )
-		{ 
+		if( PeekMessage( &uMsg, NULL, 0, 0, PM_REMOVE ) ) { 
 			TranslateMessage( &uMsg );
 			DispatchMessage( &uMsg );
 		}
-		else
+		else {
 			iUpdate();
+		}
 	}
 
 	iDestroy();

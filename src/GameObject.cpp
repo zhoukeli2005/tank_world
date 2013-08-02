@@ -40,6 +40,10 @@ GameObject::~GameObject()
 
 void GameObject::Draw()
 {
+	if(m_is_removing) {
+		return;
+	}
+
 	GameObject * child = m_first_child;
 
 	while(child) {
