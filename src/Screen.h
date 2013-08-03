@@ -96,6 +96,9 @@ namespace engine {
 			int m_width;
 			int m_height;
 
+			int m_screen_width;
+			int m_screen_height;
+
 			float m_near;
 			float m_far;
 

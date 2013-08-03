@@ -77,6 +77,10 @@ void Tank::Draw()
 	if(HaveState(E_STATE_UNDER_HIT)) {
 		float start_v = 1000;
 		float start_a = -8000;
+		if(m_where == E_WHERE_PLATFORM) {
+			start_v = 50;
+			start_a = -50;
+		}
 		
 		float all_time = abs(start_v / start_a);
 

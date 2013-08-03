@@ -68,6 +68,16 @@ void TankWorld::Start()
 	// init missile
 	m_missile = new Missile(this, E_TT_MISSILE_PLAYER);
 	m_missile->LoadFromFile(".\\resource\\missile\\m1.x");
+	
+	/*
+	engine::MeshGameObject * m = new engine::MeshGameObject(this);
+	m->LoadFromFile(".\\resource\\missile\\m1.x");
+	GetRoot()->AddChild(m);
+	GetRoot()->AddChild(m_camera);
+	m->MoveTo(0, 1000, 0);
+	m_camera->MoveTo(0, 1000, -10);
+	m_game_state = E_GAME_NORMAL;
+	return;*/
 
 	// enemy
 	m_enemy = new EnemyTank(this);
@@ -82,6 +92,11 @@ void TankWorld::Start()
 	GameLogo * logo = new GameLogo(this);
 	GetRoot()->AddChild(logo);
 	logo->MoveTo(0, LogoHeight, 0);
+
+	/*
+	SetTankView();
+	m_game_state = E_GAME_NORMAL;
+	return; */
 
 	// show logo
 	m_game_state = E_GAME_INIT_1;
@@ -155,7 +170,7 @@ void TankWorld::OnMouseMove(long x, long y)
 void TankWorld::OnKeyDown(int vk)
 {
 	if(m_game_state != E_GAME_NORMAL) {
-		if(m_game_state == E_GAME_INIT_5) {
+		if(m_game_state == E_GAME_INIT_5 || vk == VK::RETURN) {
 			m_game_state = E_GAME_NORMAL;
 			SetTankView();
 			SetRemark(NULL);
@@ -264,7 +279,7 @@ void TankWorld::CreateNewTank()
 
 	// 有 10%的概率出生在平台上，90%概率出生在地面上
 	int r = (rand() % 100);
-	if(r < 10) {
+	if(r < 5) {
 		// 出生在平台上
 
 		m_platform->AddChild(enemy);

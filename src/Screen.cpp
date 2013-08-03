@@ -139,6 +139,8 @@ void Screen::iCreateWindow()
 	WNDCLASSEX winClass;
 	memset(&winClass, 0, sizeof(WNDCLASSEX));
 
+	m_screen_width = GetSystemMetrics(SM_CXSCREEN);
+	m_screen_height = GetSystemMetrics(SM_CYSCREEN);
 
 	winClass.lpszClassName = winClassName;
 	winClass.cbSize        = sizeof(WNDCLASSEX);
@@ -161,7 +163,8 @@ void Screen::iCreateWindow()
 	m_hwnd = CreateWindowEx( 
 		NULL, winClassName, winTitle,
 		WS_OVERLAPPEDWINDOW | WS_VISIBLE,
-		0, 0, m_width, m_height, NULL, NULL, m_hinstance, NULL 
+		(m_screen_width - m_width) / 2, (m_screen_height - m_height) / 2, 
+		m_width, m_height, NULL, NULL, m_hinstance, NULL 
 	);
 
 	if( m_hwnd == NULL ) {

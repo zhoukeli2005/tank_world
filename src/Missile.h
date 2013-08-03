@@ -22,7 +22,7 @@ namespace game
 				, m_is_dispearing(0)
 			{
 				m_tank_world = (TankWorld *)scn;
-				ScaleTo(0.03, 0.03, 0.03);
+				ScaleTo(0.01, 0.01, 0.01);
 			}
 
 			~Missile() 
@@ -125,6 +125,8 @@ namespace game
 								
 				Move(dis.x, dis.y, dis.z);
 
+				ResetFace(m_curr_velocity);
+
 				// 改变速度
 				m_curr_velocity += math::Vector(0, -100 * delta, 0);
 
@@ -165,17 +167,41 @@ namespace game
 
 			// 将导弹方向设置为其运动轨迹切线
 			void ResetFace(const math::Vector & dir)
-			{
-				float tmp = dir * math::Vector(1, 0, 0) / dir.Length();
-				float a = D3DXToDegree(acos(tmp));
+			{				
+				math::Vector v = dir;
+				float rotateX = -90;
+				float len = v.Length();
+				float tmp;
+				if(len > 0) {
+					tmp = v * math::Vector(0, -1, 0) / len;
+					rotateX = D3DXToDegree(acos(tmp));
+					if(dir.z > 0) {
+						rotateX = 360 - rotateX;
+					}
+				}
+				
 
-				if(dir.z > 0) {
-					a = 360 - a;
+				v = dir;
+				v.y = 0;
+				float rotateY = 0;
+				len = v.Length();
+				if(len > 0) {
+					math::Vector vv(0, 0, -1);
+					if(dir.z > 0) {
+						vv.z = 1;
+					}
+					tmp = v * vv / len;
+					rotateY = D3DXToDegree(acos(tmp));
+
+					if(dir.z > 0 && dir.x < 0) {
+						rotateY = 360 - rotateY;
+					}
+					if(dir.z < 0 && dir.x > 0) {
+						rotateY = 360 - rotateY;
+					}
 				}
 
-				math::Vector r = GetLocalRotate();
-
-				RotateTo(0, a, 0);
+				RotateTo(rotateX, rotateY, 0);
 			}
 
 		private:
