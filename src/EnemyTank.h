@@ -33,7 +33,7 @@ namespace game
 				m_tank_world->SetRemark("Awesome!!!µÐÈË±»¼ßÃð!");
 			}
 
-			if(m_on_hit_times >= 3) {
+			if(m_on_hit_times == 3) {
 				Dispear();
 			}
 		}
@@ -47,6 +47,9 @@ namespace game
 		void tank_Update()
 		{
 			int now = GetTickCount();
+			if(!m_last_time) {
+				m_last_time = now;
+			}
 			int delta = now - m_last_time;
 
 			if(delta > 3000) {

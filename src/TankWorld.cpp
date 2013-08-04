@@ -69,16 +69,6 @@ void TankWorld::Start()
 	m_missile = new Missile(this, E_TT_MISSILE_PLAYER);
 	m_missile->LoadFromFile(".\\resource\\missile\\m1.x");
 	
-	/*
-	engine::MeshGameObject * m = new engine::MeshGameObject(this);
-	m->LoadFromFile(".\\resource\\missile\\m1.x");
-	GetRoot()->AddChild(m);
-	GetRoot()->AddChild(m_camera);
-	m->MoveTo(0, 1000, 0);
-	m_camera->MoveTo(0, 1000, -10);
-	m_game_state = E_GAME_NORMAL;
-	return;*/
-
 	// enemy
 	m_enemy = new EnemyTank(this);
 	m_enemy->LoadFromFile(".\\resource\\tank\\tank1.x");
@@ -92,12 +82,7 @@ void TankWorld::Start()
 	GameLogo * logo = new GameLogo(this);
 	GetRoot()->AddChild(logo);
 	logo->MoveTo(0, LogoHeight, 0);
-
-	/*
-	SetTankView();
-	m_game_state = E_GAME_NORMAL;
-	return; */
-
+	
 	// show logo
 	m_game_state = E_GAME_INIT_1;
 	StartLogoPresent();
@@ -178,19 +163,15 @@ void TankWorld::OnKeyDown(int vk)
 		return;
 	}
 	if(vk == VK::A) {
-	//	m_tank->Rotate(0, -2, 0);
 		m_tank->StartRotate(-40);
 	}
 	if(vk == VK::D) {
-	//	m_tank->Rotate(0, 2, 0);
 		m_tank->StartRotate(40);
 	}
 	if(vk == VK::W) {
-	//	m_tank->MoveForward(2);
 		m_tank->StartMove(40);
 	}
 	if(vk == VK::S) {
-	//	m_tank->MoveBackward(2);
 		m_tank->StartMove(-40);
 	}
 
@@ -277,7 +258,7 @@ void TankWorld::CreateNewTank()
 	EnemyTank * enemy = m_enemy->CopyTank();
 	enemy->SetOriginFaceDirection(0, 0, -1);
 
-	// 有 10%的概率出生在平台上，90%概率出生在地面上
+	// 有 5%的概率出生在平台上，95%概率出生在地面上
 	int r = (rand() % 100);
 	if(r < 5) {
 		// 出生在平台上
@@ -297,7 +278,7 @@ void TankWorld::CreateNewTank()
 	}
 
 	enemy->SetWhere(E_WHERE_TERRAIN);
-
+	
 	int dis = TerrainMinRange + (TerrainMaxRange - TerrainMinRange) * (rand() % 100) * 0.01;
 	int a = rand() % 360;
 	float posX = math::Util::quick_cos(a) * dis;

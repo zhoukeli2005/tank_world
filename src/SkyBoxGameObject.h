@@ -95,7 +95,7 @@ namespace engine
 					}
 				}
 
-				int range = (m_screen->GetNear() + m_screen->GetFar()) * 0.5;
+				float range = (m_screen->GetNear() + m_screen->GetFar()) * 0.5;
 				ScaleTo(range, range, range);
 			}
 

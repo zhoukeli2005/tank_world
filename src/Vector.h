@@ -87,7 +87,7 @@ namespace math
 
 			Vector & Normalize()
 			{
-				int len = Length();
+				float len = Length();
 				if(len > 0) {
 					x /= len;
 					y /= len;

@@ -23,6 +23,7 @@ namespace game
 				, m_rotate_velocity(0)
 				, m_range(0)
 				, m_on_hit_times(0)
+				, m_debug_dont_draw(0)
 			{
 				m_tank_world = (TankWorld *)scn; 
 			}
@@ -127,12 +128,17 @@ namespace game
 
 		// 重载 Draw 函数以进行逻辑运算
 		public:
-			void Draw();
+			virtual void Draw();
+
+		// debug
+		public:
+			int m_debug_dont_draw;
+			void DebugDontDraw() { m_debug_dont_draw = 1; }
 
 		// internal
 		protected:
 			// 找到一个不会发生碰撞的位置
-			void ResetPosition();
+			void ResetPosition(math::Vector dir);
 			void AddState(int state)
 			{
 				m_state |= state;
@@ -177,7 +183,7 @@ namespace game
 			math::Vector m_under_hit_dir;
 			math::Vector m_under_hit_pos;
 
-			int m_range;
+			float m_range;
 
 			int m_on_hit_times;
 

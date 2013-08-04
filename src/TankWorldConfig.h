@@ -18,7 +18,7 @@ namespace game
 	const int MissileExistDuration = 1000;
 	const int MissileVelocity = 400;
 
-	const int MaxEnemyCount = 5;
+	const int MaxEnemyCount = 10;
 
 	const int TerrainSize = 10;
 	const int TerrainMinRange = 200;

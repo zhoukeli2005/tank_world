@@ -1,5 +1,6 @@
 #include "Tank.h"
 #include "TankWorld.h"
+#include "Util.h"
 
 using namespace game;
 
@@ -30,7 +31,7 @@ void Tank::MoveTo(float x, float y, float z)
 			return;
 	}
 
-	ResetPosition();
+	ResetPosition(direction);
 
 	tank_OnCollideTank((Tank*)other);
 
@@ -56,15 +57,19 @@ void Tank::OctTreeConflict(OctTreeData * other, math::Vector direction)
 
 void Tank::Draw()
 {
-	MeshGameObject::Draw();
-
 	if(!m_last_tick) {
 		m_last_tick = GetTickCount();
 		return;
 	}
-
 	int now = GetTickCount();
 	int delta = now - m_last_tick;
+
+	if(delta < 10) {
+		Warning("too much");
+	}
+	MeshGameObject::Draw();
+
+	m_last_tick = now;
 
 	if(HaveState(E_STATE_MOVE_ROTATE) && !HaveState(E_STATE_FIRE)) {
 		if(m_move_velocity) {
@@ -104,21 +109,28 @@ void Tank::Draw()
 	}
 
 	tank_Update();
-
-	m_last_tick = now;
 }
 
-void Tank::ResetPosition()
+void Tank::ResetPosition(math::Vector dir)
 {
 	engine::OctTreeData * other = m_tank_world->GetOctTree()->CheckConflict(this, math::Vector(0, 0, 1));
 
 	math::Vector origin = GetLocalPosition();
 
-	int loop = 5;
+	dir.y = 0;
+	dir.Normalize();
+	if(dir.Length() <= 0) {
+		dir = math::Vector(0, 0, 1);
+	}
+
+	float loop = 1000;
+	float range = 10;
 	while(other && loop-- > 0) {
-		float tmpX = origin.x + (rand() % 10 - 5);
+		float tmpX = origin.x + range * dir.x * -1;
 		float tmpY = origin.y;
-		float tmpZ = origin.z + (rand() % 10 - 5);
+		float tmpZ = origin.z + range * dir.z * -1;
+
+		range += 10;
 
 		MeshGameObject::MoveTo(tmpX, tmpY, tmpZ);
 		other = m_tank_world->GetOctTree()->CheckConflict(this, math::Vector(tmpX - origin.x, tmpY - origin.y, tmpZ - origin.z));

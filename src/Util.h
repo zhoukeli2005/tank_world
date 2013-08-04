@@ -81,43 +81,6 @@ namespace math
 
 				return m_cos[(int)degree] * sgn;
 			}
-/*
-			
-						static float quick_acos(float v)
-						{
-							int sgn = 1;
-							if(v < 0) {
-								v *= -1;
-								sgn = -1;
-							}
-			
-							if(v == 1) {
-								return 0;
-							}
-							if(v == -1) {
-								return 180;
-							}
-							if(v == 0) {
-								return 90;
-							}
-			
-							// binary search
-							int low, high, mid;
-							low = 0;
-							high = 89;
-							while(low <= high) {
-								mid = (low + high) / 2;
-								if(m_cos[mid] == v) {
-									return mid;
-								}
-								if(m_cos[mid] > v) {
-									low = mid + 1;
-									continue;
-								}
-								high = mid - 1;
-							}
-							return mid;
-						}*/
 			
 
 		private:

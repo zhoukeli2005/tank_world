@@ -59,9 +59,7 @@ void Screen::iUpdate()
 	if(now - m_last_draw > 10) {
 
 		calculateFPS(now);
-
-		m_last_draw = now;
-
+	
 		m_pdevice9->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER,
 			D3DCOLOR_COLORVALUE(1.0f,1.0f,1.0f,1.0f), 1.0f, 0 );
 
@@ -129,6 +127,8 @@ void Screen::iUpdate()
 
 		m_pdevice9->EndScene();
 		m_pdevice9->Present(NULL, NULL, NULL, NULL);
+
+		m_last_draw = GetTickCount();
 	}
 
 	iEnterFrame();
@@ -220,7 +220,7 @@ void Screen::iInitD3D9()
 		d3dpp.PresentationInterval   = D3DPRESENT_INTERVAL_IMMEDIATE;
 
 		m_pd3d9->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, m_hwnd,
-			D3DCREATE_SOFTWARE_VERTEXPROCESSING,
+			/*D3DCREATE_SOFTWARE_VERTEXPROCESSING*/ D3DCREATE_HARDWARE_VERTEXPROCESSING,
 			&d3dpp, &m_pdevice9 );
 
 		m_pdevice9->SetRenderState( D3DRS_LIGHTING, TRUE );			//  π”√π‚’’
